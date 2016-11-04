@@ -17,7 +17,7 @@ func (c *tagCommand) usage() string {
 }
 
 func (c *tagCommand) help() string {
-	return "Return tag for hostname"
+	return "returns tag for hostname"
 }
 
 func (c *tagCommand) run(args []string) error {

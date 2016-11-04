@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func init() {
-	commands["register"] = &noopCommand{}
+	commands["register"] = &registerCommand{}
 }
 
 type registerCommand struct{}
@@ -13,7 +13,7 @@ func (c *registerCommand) usage() string {
 }
 
 func (c *registerCommand) help() string {
-	return "Return register"
+	return "is to be implement"
 }
 
 func (c *registerCommand) run(args []string) error {

@@ -6,14 +6,26 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"gopkg.in/tumblr/go-collins.v0/collins"
 )
 
 var (
-	uri      = flag.String("uri", first(os.Getenv("COLLINS_URL"), "http://localhost:9000/api"), "url to collins api")
-	user     = flag.String("user", first(os.Getenv("COLLINS_USER"), "blake"), "collins user")
-	password = flag.String("password", first(os.Getenv("COLLINS_PASSWORD"), "admin:first"), "collins password")
+	BuildVersion  string
+	BuildRevision string
+	BuildBranch   string
+	BuildDate     string
+	BuildUser     string
+	versionInfo   = `tom ` + BuildVersion + ` (branch: ` + BuildBranch + `, revision: ` + BuildRevision + `)
+  build date: ` + BuildDate + `
+  build user: ` + BuildUser + `
+  go version: ` + runtime.Version()
+
+	uri          = flag.String("uri", first(os.Getenv("COLLINS_URL"), "http://localhost:9000/api"), "URL to Collins API")
+	user         = flag.String("user", first(os.Getenv("COLLINS_USER"), "blake"), "Collins user")
+	password     = flag.String("password", first(os.Getenv("COLLINS_PASSWORD"), "admin:first"), "Collins password")
+	printVersion = flag.Bool("v", false, "Print version and exit")
 
 	client *collins.Client
 
@@ -56,6 +68,10 @@ func forAssets(opts *collins.AssetFindOpts, f func(*collins.Asset)) error {
 func main() {
 	flag.Usage = func() { printUsage("") }
 	flag.Parse()
+	if *printVersion {
+		fmt.Fprintln(os.Stderr, versionInfo)
+		os.Exit(0)
+	}
 	var err error
 	client, err = collins.NewClient(*user, *password, *uri)
 	if err != nil {
@@ -82,7 +98,7 @@ func printUsage(message string) {
 	if message != "" {
 		message = message + "\n"
 	}
-	fmt.Fprintln(os.Stderr, message+"Usage: collins-cli [options] sub-command")
+	fmt.Fprintln(os.Stderr, message+"tom "+BuildVersion+" - Usage: tom [options] sub-command")
 	flag.PrintDefaults()
 	fmt.Fprintln(os.Stderr, "\nSub commands:")
 	for n, c := range commands {

@@ -10,11 +10,11 @@ all: bin/tom
 bin/tom: $(SOURCES)
 	mkdir -p bin
 	cd tom && go build -o ../$@ -ldflags "\
-		-X main.BuildVersion=${VERSION:undefined=v0.0.0-dev} \
-		-X main.BuildRevision=${REVISION} \
-		-X main.BuildBranch=${BRANCH} \
-		-X main.BuildUser=${USER} \
-		-X main.BuildDate=${DATE} \
+		-X main.buildVersion=${VERSION:undefined=v0.0.0-dev} \
+		-X main.buildRevision=${REVISION} \
+		-X main.buildBranch=${BRANCH} \
+		-X main.buildUser=${USER} \
+		-X main.buildDate=${DATE} \
 	" ./...
 
 .PHONY: build

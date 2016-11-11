@@ -4,15 +4,15 @@ import "testing"
 
 func TestFirst(t *testing.T) {
 	if first("foo") != "foo" {
-		t.Fatal()
+		t.Fatal("err")
 	}
 	if first("foo", "bar") != "foo" {
-		t.Fatal()
+		t.Fatal("err")
 	}
 	if first("", "foo", "bar") != "foo" {
-		t.Fatal()
+		t.Fatal("err")
 	}
 	if first("", "") != "" {
-		t.Fatal()
+		t.Fatal("err")
 	}
 }

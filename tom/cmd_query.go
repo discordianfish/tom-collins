@@ -34,7 +34,9 @@ func (c *queryCommand) run(args []string) error {
 		tmplStr   = flags.String("t", defaultTemplate, "template to use when printing assets")
 		noNewline = flags.Bool("n", true, "don't print newlines between assets")
 	)
-	flags.Parse(args)
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
 	args = flags.Args()
 	if len(args) < 1 {
 		return errUsage

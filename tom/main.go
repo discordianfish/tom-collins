@@ -12,14 +12,14 @@ import (
 )
 
 var (
-	BuildVersion  string
-	BuildRevision string
-	BuildBranch   string
-	BuildDate     string
-	BuildUser     string
-	versionInfo   = `tom ` + BuildVersion + ` (branch: ` + BuildBranch + `, revision: ` + BuildRevision + `)
-  build date: ` + BuildDate + `
-  build user: ` + BuildUser + `
+	buildVersion  string
+	buildRevision string
+	buildBranch   string
+	buildDate     string
+	buildUser     string
+	versionInfo   = `tom ` + buildVersion + ` (branch: ` + buildBranch + `, revision: ` + buildRevision + `)
+  build date: ` + buildDate + `
+  build user: ` + buildUser + `
   go version: ` + runtime.Version()
 
 	uri          = flag.String("uri", first(os.Getenv("COLLINS_URL"), "http://localhost:9000/api"), "URL to Collins API")
@@ -98,7 +98,7 @@ func printUsage(message string) {
 	if message != "" {
 		message = message + "\n"
 	}
-	fmt.Fprintln(os.Stderr, message+"tom "+BuildVersion+" - Usage: tom [options] sub-command")
+	fmt.Fprintln(os.Stderr, message+"tom "+buildVersion+" - Usage: tom [options] sub-command")
 	flag.PrintDefaults()
 	fmt.Fprintln(os.Stderr, "\nSub commands:")
 	for n, c := range commands {

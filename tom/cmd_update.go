@@ -38,34 +38,50 @@ func (c *updateCommand) run(args []string) error {
 		return errUsage
 	}
 	attribute := args[0]
-	if *remove {
-		return findAssets(*tag,
-			*hostname,
-			*query,
-			func(a collins.Asset) {
-				_, err := client.Assets.DeleteAttribute(a.Metadata.Tag, attribute)
-				if err != nil {
-					log.Fatal(err)
-				}
-			},
-		)
+	findOpts, err := newFindOpts(*tag, *hostname, *query)
+	if err != nil {
+		return err
 	}
+	if *remove {
+		return c.remove(findOpts, attribute)
+	}
+
 	if len(args) != 2 {
 		return fmt.Errorf("Value required for setting attributes")
 	}
-	opts := &collins.AssetUpdateOpts{
-		Attribute: attribute + ";" + args[1],
+	return c.set(findOpts, attribute, args[1])
+}
+
+func (c *updateCommand) remove(findOpts *collins.AssetFindOpts, attribute string) error {
+	it, err := NewFindIterator(findOpts)
+	if err != nil {
+		return err
 	}
-	return findAssets(
-		*tag,
-		*hostname,
-		*query,
-		func(a collins.Asset) {
-			log.Println("Setting", attribute, "=", args[1], "on", a.Metadata.Tag)
-			_, err := client.Assets.Update(a.Metadata.Tag, opts)
-			if err != nil {
-				log.Fatal(err)
-			}
-		},
-	)
+	for it.Next() {
+		asset := it.Value()
+		_, err := client.Assets.DeleteAttribute(asset.Metadata.Tag, attribute)
+		if err != nil {
+			return err
+		}
+	}
+	return it.Err()
+}
+
+func (c *updateCommand) set(findOpts *collins.AssetFindOpts, attribute, value string) error {
+	opts := &collins.AssetUpdateOpts{
+		Attribute: attribute + ";" + value,
+	}
+	it, err := NewFindIterator(findOpts)
+	if err != nil {
+		return err
+	}
+	for it.Next() {
+		asset := it.Value()
+		log.Println("Setting", attribute, "=", value, "on", asset.Metadata.Tag)
+		_, err := client.Assets.Update(asset.Metadata.Tag, opts)
+		if err != nil {
+			return err
+		}
+	}
+	return it.Err()
 }

@@ -45,13 +45,18 @@ func (c *queryCommand) run(args []string) error {
 	if err != nil {
 		return err
 	}
-	return query(&collins.AssetFindOpts{Query: strings.Join(args, " ")}, func(asset collins.Asset) {
-		err := tmpl.Execute(os.Stdout, asset)
+	it, err := NewFindIterator(&collins.AssetFindOpts{Query: strings.Join(args, " ")})
+	if err != nil {
+		return err
+	}
+	for it.Next() {
+		err := tmpl.Execute(os.Stdout, it.Value())
 		if *noNewline {
 			fmt.Println("")
 		}
 		if err != nil {
-			log.Println(err)
+			log.Fatal(err)
 		}
-	})
+	}
+	return it.Err()
 }

@@ -12,7 +12,7 @@ import (
 	"gopkg.in/tumblr/go-collins.v0/collins"
 )
 
-func tmplFindByTag(tag string) *collins.Asset {
+func tmplGet(tag string) *collins.Asset {
 	asset, _, err := client.Assets.Get(tag)
 	if err != nil {
 		log.Fatal(err)
@@ -42,18 +42,23 @@ func newTemplater(args []string, remote bool) (*templater, error) {
 	t := &templater{
 		templates: make(map[string]*template.Template, len(args)),
 	}
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
 	funcMap := template.FuncMap{
-		"FindByTag": tmplFindByTag,
-		"Query":     tmplQuery,
-		"now":       time.Now,
-		"add":       func(a, b int) int { return a + b },
-		"sub":       func(a, b int) int { return a + b },
-		"prefix":    strings.HasPrefix,
-		"suffix":    strings.HasSuffix,
-		"split":     strings.Split,
-		"splitN":    strings.SplitN,
-		"lower":     strings.ToLower,
-		"upper":     strings.ToUpper,
+		"get":    tmplGet,
+		"this":   func() *collins.Asset { return tmplGet(hostname) },
+		"query":  tmplQuery,
+		"now":    time.Now,
+		"add":    func(a, b int) int { return a + b },
+		"sub":    func(a, b int) int { return a + b },
+		"prefix": strings.HasPrefix,
+		"suffix": strings.HasSuffix,
+		"split":  strings.Split,
+		"splitN": strings.SplitN,
+		"lower":  strings.ToLower,
+		"upper":  strings.ToUpper,
 	}
 	for _, arg := range args {
 		parts := strings.SplitN(arg, ":", 2)

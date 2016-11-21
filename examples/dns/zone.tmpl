@@ -1,4 +1,4 @@
-{{ $domain := index (FindByTag "default").Attributes "0" "DOMAIN" }}
+{{ $domain := index (get "default").Attributes "0" "DOMAIN" }}
 $ORIGIN {{ $domain }}.
 $TTL 300
 
@@ -11,15 +11,14 @@ $TTL 300
 )
 
 ; Nameserver
-{{ range $i, $asset := Query (print "DNS_NAMESERVER=^" $domain "$") }}
+{{ range $i, $asset := query (print "DNS_NAMESERVER=^" $domain "$") }}
 {{ $n := add $i 1 }}
 @   IN NS ns{{$n}}
 ns{{$n}} IN A  {{ range $asset.Addresses }}{{ if prefix .Pool "PROD" }}{{ .Address }}{{ end }}{{ end }}
 {{ end }}
 
 ; Everything with a hostname
-; range Query "HOSTNAME=*"
-{{- range Query "HOSTNAME=sjc1-b1-" }}
+{{- range query "HOSTNAME=*" }}
 {{- $name := index .Attributes "0" "HOSTNAME" }}
 {{- range .Addresses }}
 {{- $pool := index (splitN .Pool "-" 2) 0 }}

@@ -1,7 +1,9 @@
 dependencies:
   override:
     - go get -t -d -v ./...
-    - make
+    - mkdir -p build/{linux,darwin}/bin
+    - BINARY=build/linux/bin/tom  make
+    - BINARY=build/darwin/bin/tom GOOS=darwin make
 
 test:
   override:
@@ -11,7 +13,8 @@ deployment:
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
     commands:
-      - tar czf $CIRCLE_ARTIFACTS/tom-collins-$CIRCLE_TAG.linux-amd64.tar.gz bin/tom
+      - tar -C build/linux  -czf $CIRCLE_ARTIFACTS/tom-collins-$CIRCLE_TAG.linux-amd64.tar.gz bin/tom
+      - tar -C build/darwin -czf $CIRCLE_ARTIFACTS/tom-collins-$CIRCLE_TAG.darwin-amd64.tar.gz bin/tom
       - gem install fpm
       - fpm -v $( echo $CIRCLE_TAG | tr -d v ) --url $CIRCLE_REPOSITORY_URL -p $CIRCLE_ARTIFACTS/
-        --provides tom -n tom-collins -t deb -s dir bin/=/opt/bin
+        --provides tom -n tom-collins -t deb -s dir build/linux/bin/=/opt/bin

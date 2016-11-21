@@ -48,23 +48,6 @@ func first(ss ...string) string {
 	return ""
 }
 
-func forAssets(opts *collins.AssetFindOpts, f func(*collins.Asset)) error {
-	for {
-		assets, resp, err := client.Assets.Find(opts)
-		if err != nil {
-			return err
-		}
-		for _, asset := range assets {
-			f(&asset)
-		}
-		if resp.NextPage == resp.CurrentPage {
-			break
-		}
-		opts.PageOpts.Page++
-	}
-	return nil
-}
-
 func main() {
 	flag.Usage = func() { printUsage("") }
 	flag.Parse()

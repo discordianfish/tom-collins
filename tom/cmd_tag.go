@@ -24,10 +24,13 @@ func (c *tagCommand) run(args []string) error {
 	if len(args) != 1 {
 		return errUsage
 	}
-	opts := &collins.AssetFindOpts{
-		Attribute: "hostname;^" + args[0] + "$",
+
+	it, err := NewFindIterator(&collins.AssetFindOpts{Attribute: "hostname;^" + args[0] + "$"})
+	if err != nil {
+		return err
 	}
-	return forAssets(opts, func(asset *collins.Asset) {
-		fmt.Println(asset.Tag)
-	})
+	for it.Next() {
+		fmt.Println(it.Value().Tag)
+	}
+	return it.Err()
 }

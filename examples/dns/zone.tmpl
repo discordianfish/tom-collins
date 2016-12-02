@@ -17,11 +17,15 @@ $TTL 300
 ns{{$n}} IN A  {{ range $asset.Addresses }}{{ if prefix .Pool "PROD" }}{{ .Address }}{{ end }}{{ end }}
 {{ end }}
 
-; Everything with a hostname
-{{- range query "HOSTNAME=*" }}
-{{- $name := index .Attributes "0" "HOSTNAME" }}
+; Everything with an IP
+{{- range query "ip_address=*" }}
+{{- $name := or (index .Attributes "0" "HOSTNAME") .Tag }}
+{{- if not $name }}{{ $name := .Tag }}{{ end }}
 {{- range .Addresses }}
 {{- $pool := index (splitN .Pool "-" 2) 0 }}
 {{ printf "%-20s" (print $name "." (lower $pool)) }} IN A {{ .Address }}
 {{- end }}
 {{- end }}
+
+; Raw zonefile
+{{ index (get "default").Attributes "0" "ZONEFILE" }}

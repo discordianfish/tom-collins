@@ -5,22 +5,24 @@
 ```
 tom v0.0.0-dev - Usage: tom [options] sub-command
   -password string
-    	Collins password (default "admin:first")
+      Collins password (default "admin:first")
   -uri string
-    	URL to Collins API (default "http://localhost:9000/api")
+      URL to Collins API (default "http://localhost:9000/api")
   -user string
-    	Collins user (default "blake")
-  -v	Print version and exit
+      Collins user (default "blake")
+  -v  Print version and exit
 
 Sub commands:
   - query <cql query>
-	 query runs a CQL query and returns matching assets
+   query runs a CQL query and returns matching assets
   - register <hostname>
-	 register is to be implement
+   register is to be implement
   - tag <hostname>
-	 tag returns tag for hostname
+   tag returns tag for hostname
   - template <template:[destination]> [template...]
-	 template renders templates with assets returned by given query.
+   template renders templates with assets returned by given query.
+  - update <attribute> [value]
+   update Update attributes on assets
 ```
 
 ### Sub commands

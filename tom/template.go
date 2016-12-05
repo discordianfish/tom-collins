@@ -74,7 +74,7 @@ func newTemplater(args []string, remote bool) (*templater, error) {
 		}
 		tmplStr := ""
 		if remote {
-			str, err := loadTemplateCollins(arg)
+			str, err := loadTemplateCollins(file)
 			if err != nil {
 				return nil, err
 			}

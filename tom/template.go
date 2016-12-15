@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -34,6 +37,14 @@ func tmplQuery(q string) (assets []collins.Asset) {
 	return assets
 }
 
+func tmplPools() []collins.Pool {
+	pools, _, err := client.IPAM.Pools()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return pools
+}
+
 type templater struct {
 	templates map[string]*template.Template
 }
@@ -59,6 +70,30 @@ func newTemplater(args []string, remote bool) (*templater, error) {
 		"splitN": strings.SplitN,
 		"lower":  strings.ToLower,
 		"upper":  strings.ToUpper,
+		"pools":  tmplPools,
+		"ip2int": func(ip string) int {
+			return int(binary.BigEndian.Uint32(net.ParseIP(ip).To4()))
+		},
+		"int2ip": func(ip int) net.IP {
+			buf := make([]byte, 4)
+			binary.BigEndian.PutUint32(buf, uint32(ip))
+			return net.IP(buf)
+		},
+		"parse_cidr_net": func(s string) (*net.IPNet, error) {
+			_, net, err := net.ParseCIDR(s)
+			return net, err
+		},
+		"parse_cidr_ip": func(s string) (net.IP, error) {
+			ip, _, err := net.ParseCIDR(s)
+			return ip, err
+		},
+		"mask2quad": func(mask net.IPMask) string {
+			mstr := make([]string, len(mask))
+			for i, n := range mask {
+				mstr[i] = strconv.Itoa(int(n))
+			}
+			return strings.Join(mstr, ".")
+		},
 	}
 	for _, arg := range args {
 		parts := strings.SplitN(arg, ":", 2)

@@ -1,0 +1,11 @@
+{{ $domain := index (get "default").Attributes "0" "DOMAIN" }}
+{{ range $i, $pool := pools }}
+{{- if ne $pool.PossibleAddresses 0 }}
+# {{ $pool.Name }}
+subnet {{ parse_cidr_ip $pool.Network }} netmask {{ mask2quad (parse_cidr_net $pool.Network).Mask }} {
+  range {{ $pool.StartAddress }} {{ int2ip (add (ip2int $pool.StartAddress) $pool.PossibleAddresses) }}
+  option routers {{ $pool.Gateway }};
+  option domain-name {{ lower (index (splitN $pool.Name "-" 2) 0) }}.{{ $domain }};
+}
+{{- end }}
+{{ end }}
